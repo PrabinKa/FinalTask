@@ -1,29 +1,13 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Dimensions,
-  Image,
-} from 'react-native';
-import {
-  heightPixel,
-  verticalSpace,
-  fontSize,
-  horizontalSpace,
-  COLORS,
-} from '../../constants';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import {ProductInterface, ProductListInterface} from '../../types/ProductTypes';
-import {setProductDetails} from '../../redux/slices/ProductSlice';
-import {useAppDispatch} from '../../redux/hooks/hooks';
+import {View, FlatList, Dimensions} from 'react-native';
+import {verticalSpace, horizontalSpace} from '../../constants';
+import {ProductInterface} from '../../types/ProductTypes';
+import {Product} from '../../components';
 
 const {width: screenWidth} = Dimensions.get('window');
 
 interface ProductContainerProps {
-  data: ProductListInterface;
+  data: ProductInterface[];
   navigation: any;
 }
 
@@ -31,23 +15,6 @@ const ProductContainer: React.FC<ProductContainerProps> = ({
   data,
   navigation,
 }) => {
-  const {
-    productImageWrapper,
-    productDetailsWrapper,
-    productImageStyles,
-    ratingContainer,
-    ratingStyles,
-    productNameStyles,
-    productPriceStyles,
-  } = styles;
-
-  const dispatch = useAppDispatch();
-
-  const onPressHandler = (item: ProductInterface) => {
-    dispatch(setProductDetails(item));
-    navigation.navigate('ProductDetail', item);
-  };
-
   return (
     <FlatList
       horizontal
@@ -58,33 +25,13 @@ const ProductContainer: React.FC<ProductContainerProps> = ({
         <View style={{width: horizontalSpace(20)}} />
       )}
       contentContainerStyle={{marginVertical: verticalSpace(10)}}
-      renderItem={({item, index}) => {
-        // console.log('item', item);
+      renderItem={({item}) => {
         return (
-          <TouchableOpacity
-            activeOpacity={0.6}
-            onPress={() => onPressHandler(item)}
-            style={{
-              width: screenWidth / 2.2,
-            }}>
-            <View style={productImageWrapper}>
-              <Image
-                source={{uri: item.thumbnail}}
-                style={productImageStyles}
-              />
-            </View>
-            <View style={productDetailsWrapper}>
-              <View style={ratingContainer}>
-                <Ionicons name="star" size={16} color={'#FFCB00'} />
-                <Text style={ratingStyles}>{item.rating}</Text>
-              </View>
-              <Text style={productNameStyles}>{item.title}</Text>
-              <Text
-                style={
-                  productPriceStyles
-                }>{`$${item.price} (${item.discountPercentage}% off)`}</Text>
-            </View>
-          </TouchableOpacity>
+          <Product
+            item={item}
+            navigation={navigation}
+            containerStyle={{width: screenWidth / 2.2}}
+          />
         );
       }}
     />
@@ -92,44 +39,3 @@ const ProductContainer: React.FC<ProductContainerProps> = ({
 };
 
 export default ProductContainer;
-
-const styles = StyleSheet.create({
-  productImageWrapper: {
-    height: heightPixel(120),
-    width: '100%',
-    backgroundColor: COLORS.WHITE,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 5,
-  },
-  productImageStyles: {
-    height: '100%',
-    width: '100%',
-    resizeMode: 'contain',
-  },
-  productDetailsWrapper: {
-    marginVertical: verticalSpace(10),
-    paddingHorizontal: horizontalSpace(5),
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ratingStyles: {
-    color: COLORS.TEXT_PRIMARY,
-    fontSize: fontSize(14),
-    fontWeight: 'bold',
-    marginLeft: 5,
-  },
-  productNameStyles: {
-    color: COLORS.TEXT_PRIMARY,
-    fontSize: fontSize(18),
-    fontWeight: 'bold',
-  },
-  productPriceStyles: {
-    color: COLORS.TEXT_PRIMARY,
-    fontSize: fontSize(18),
-    fontWeight: '500',
-  },
-});

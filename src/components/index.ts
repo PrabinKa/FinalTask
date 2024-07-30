@@ -4,6 +4,7 @@ import ErrorModal from "./error/ErrorModal";
 import UserInputs from "./inputs/UserInputs";
 import PlainButton from "./buttons/PlainButton";
 import ButtonWithIcon from "./buttons/ButtonWithIcon";
+import Product from "./product/Product";
 
 export {
     Header,
@@ -11,5 +12,6 @@ export {
     ErrorModal,
     UserInputs,
     PlainButton,
-    ButtonWithIcon
+    ButtonWithIcon,
+    Product
 }
