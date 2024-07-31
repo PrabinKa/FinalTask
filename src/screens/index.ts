@@ -7,6 +7,7 @@ import Todos from "./todos/Todos";
 import SplashScreen from "./splash/SplashScreen";
 import LoginScreen from "./login/LoginScreen";
 import ProductDetail from "./product_detail/ProductDetail";
+import EditPostScreen from "./post/EditPostScreen";
 
 export {
     Account,
@@ -17,5 +18,6 @@ export {
     Todos,
     SplashScreen,
     LoginScreen,
-    ProductDetail
+    ProductDetail,
+    EditPostScreen
 }

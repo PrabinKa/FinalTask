@@ -23,7 +23,7 @@ export const cartSlice = createSlice({
       const selectedProduct = action.payload;
 
       product.forEach(item => {
-        if (item.minimumOrderQuantity >= item.quantity + 1) {
+        if (item.minimumOrderQuantity >= item.quantity + 1 && item.stock >= 1) {
           if (item.id === selectedProduct.id) {
             item.quantity++;
             item.stock--;

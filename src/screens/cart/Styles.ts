@@ -6,13 +6,6 @@ export const styles = StyleSheet.create({
       flex: 1,
       backgroundColor: COLORS.BACKGROUND,
     },
-    titleStyles: {
-      fontSize: fontSize(24),
-      color: COLORS.TEXT_PRIMARY,
-      fontWeight: '600',
-      alignSelf: 'center',
-      marginVertical: verticalSpace(15),
-    },
     totalPriceWrapper: {
       flexDirection: 'row',
       alignItems: 'center',

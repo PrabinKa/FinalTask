@@ -3,7 +3,7 @@ import {SafeAreaView, Text, View} from 'react-native';
 import {useAppSelector} from '../../redux/hooks/hooks';
 import {COLORS, verticalSpace, heightPixel} from '../../constants';
 import CartItem from './CartItem';
-import {PlainButton, ErrorModal} from '../../components';
+import {PlainButton, ErrorModal, Header} from '../../components';
 import {styles} from './Styles';
 
 interface CartProps {
@@ -13,7 +13,6 @@ interface CartProps {
 const Cart: React.FC<CartProps> = ({navigation}) => {
   const {
     container,
-    titleStyles,
     totalPriceWrapper,
     totalPriceText,
     totalPriceValue,
@@ -46,41 +45,42 @@ const Cart: React.FC<CartProps> = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={container}>
-      <Text style={titleStyles}>My Cart</Text>
-      {cartProducts.length !== 0 && (
-        <>
-          <View style={{height: '75%'}}>
-            <CartItem data={cartProducts} />
-          </View>
-          <View style={totalPriceWrapper}>
-            <Text style={totalPriceText}>Total Price:</Text>
-            <Text style={totalPriceValue}>{`$${calculateTotalPrice()}`}</Text>
-          </View>
-          <PlainButton
-            onPress={() => {}}
-            containerStyle={{
-              height: heightPixel(50),
-              width: '50%',
-              marginVertical: verticalSpace(10),
-              borderRadius: verticalSpace(10),
-              alignSelf: 'center',
-            }}
-            textStyle={{
-              color: COLORS.WHITE,
-            }}>
-            Check Out
-          </PlainButton>
-        </>
-      )}
-      {error && (
-        <ErrorModal
-          message={error}
-          isVisible={modalVisible}
-          onClose={toggleModal}
-        />
-      )}
-    </SafeAreaView>
+    <Header navigation={navigation}>
+      <View style={container}>
+        {cartProducts.length !== 0 && (
+          <>
+            <View style={{height: '75%'}}>
+              <CartItem data={cartProducts} />
+            </View>
+            <View style={totalPriceWrapper}>
+              <Text style={totalPriceText}>Total Price:</Text>
+              <Text style={totalPriceValue}>{`$${calculateTotalPrice()}`}</Text>
+            </View>
+            <PlainButton
+              onPress={() => {}}
+              containerStyle={{
+                height: heightPixel(50),
+                width: '50%',
+                marginVertical: verticalSpace(10),
+                borderRadius: verticalSpace(10),
+                alignSelf: 'center',
+              }}
+              textStyle={{
+                color: COLORS.WHITE,
+              }}>
+              Check Out
+            </PlainButton>
+          </>
+        )}
+        {error && (
+          <ErrorModal
+            message={error}
+            isVisible={modalVisible}
+            onClose={toggleModal}
+          />
+        )}
+      </View>
+    </Header>
   );
 };
 
