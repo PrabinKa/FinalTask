@@ -1,28 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  Dimensions,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import {StyleSheet, Text, View, ScrollView} from 'react-native';
 import {Header, Loader} from '../../components';
-import {
-  COLORS,
-  fontSize,
-  heightPixel,
-  horizontalSpace,
-  verticalSpace,
-} from '../../constants';
+import {COLORS, fontSize, heightPixel, verticalSpace} from '../../constants';
 import ImageBanner from './ImageBanner';
 import {fetchProducts} from '../../services/FetchProducts';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProductContainer from './ProductContainer';
-
-const {height, width: screenWidth} = Dimensions.get('window');
 
 interface HomeProps {
   navigation: any;
@@ -35,17 +17,15 @@ const Home: React.FC<HomeProps> = ({navigation}) => {
   const [beautyProducts, setBeautyProducts] = useState();
   const [groceriesProducts, setGroceriesProducts] = useState();
 
-  // console.log('state', smartPhoneProducts);
-
   useEffect(() => {
     getAllProducts();
   }, []);
 
+  //product lists by category
   const getAllProducts = async () => {
     setIsLoading(true);
     try {
       const response = await fetchProducts();
-      // console.log('res', response);
 
       if (response) {
         const {smartPhones, beautyProducts, groceries} = response;
@@ -68,7 +48,10 @@ const Home: React.FC<HomeProps> = ({navigation}) => {
           {smartPhoneProducts && (
             <View style={productListStyles}>
               <Text style={categoryTextStyles}>Smart Phones</Text>
-              <ProductContainer data={smartPhoneProducts} navigation={navigation} />
+              <ProductContainer
+                data={smartPhoneProducts}
+                navigation={navigation}
+              />
             </View>
           )}
           {beautyProducts && (
@@ -80,7 +63,10 @@ const Home: React.FC<HomeProps> = ({navigation}) => {
           {groceriesProducts && (
             <View style={productListStyles}>
               <Text style={categoryTextStyles}>Groceries</Text>
-              <ProductContainer data={groceriesProducts} navigation={navigation} />
+              <ProductContainer
+                data={groceriesProducts}
+                navigation={navigation}
+              />
             </View>
           )}
           <View style={{height: heightPixel(60)}} />

@@ -1,9 +1,7 @@
 import React, {useState} from 'react';
 import {
-  FlatList,
   Image,
   SafeAreaView,
-  StyleSheet,
   Text,
   View,
   Dimensions,
@@ -11,14 +9,7 @@ import {
   Animated,
   ToastAndroid,
 } from 'react-native';
-import {
-  COLORS,
-  fontSize,
-  heightPixel,
-  horizontalSpace,
-  verticalSpace,
-  widthPixel,
-} from '../../constants';
+import {COLORS, heightPixel, verticalSpace, STRINGS} from '../../constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Paginator from './Paginator';
 import {PlainButton, ErrorModal} from '../../components';
@@ -26,13 +17,14 @@ import {useAppSelector} from '../../redux/hooks/hooks';
 import {useAppDispatch} from '../../redux/hooks/hooks';
 import {addToCart} from '../../redux/slices/CartSlice';
 import {priceAfterDiscount} from '../../utils';
+import {styles} from './Styles';
 
 interface ProductDetailProps {
   route: any;
   navigation: any;
 }
 
-const {height, width: screenWidth} = Dimensions.get('window');
+const {width: screenWidth} = Dimensions.get('window');
 
 const ProductDetail: React.FC<ProductDetailProps> = ({route, navigation}) => {
   const item = route.params;
@@ -64,7 +56,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({route, navigation}) => {
     setShowMessage(!showMessage);
   };
 
+  //add to cart
   const addToCartHandler = () => {
+    //checks product is already added to cart or not
     const isAddedToCart = cartProducts.some(cart => {
       return cart.title === item.title;
     });
@@ -107,7 +101,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({route, navigation}) => {
             pagingEnabled
             data={productDetails.images}
             keyExtractor={(_, index) =>
-              `images${Number.parseInt(`${Math.random() * 100}`)}`
+              `images${Number.parseInt(`${Math.random() * 100}${index}`)}`
             }
             onScroll={Animated.event(
               [
@@ -120,7 +114,6 @@ const ProductDetail: React.FC<ProductDetailProps> = ({route, navigation}) => {
               {useNativeDriver: false},
             )}
             renderItem={({item, index}) => {
-              // console.log('imageUri', productDetails);
               return (
                 <View
                   style={{
@@ -161,11 +154,6 @@ const ProductDetail: React.FC<ProductDetailProps> = ({route, navigation}) => {
             </Text>
           </View>
         </View>
-        <Text
-          style={[
-            ratingStyles,
-            {marginTop: verticalSpace(20)},
-          ]}>{`Stock: ${item.stock}`}</Text>
         <Text style={descriptionStyles}>{productDetails.description}</Text>
         <View style={bottomContainer}>
           <View>
@@ -189,7 +177,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({route, navigation}) => {
             textStyle={{
               color: COLORS.WHITE,
             }}>
-            Add to Cart
+            {STRINGS.ADD_TO_CART}
           </PlainButton>
         </View>
       </View>
@@ -203,101 +191,3 @@ const ProductDetail: React.FC<ProductDetailProps> = ({route, navigation}) => {
 };
 
 export default ProductDetail;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.BACKGROUND,
-  },
-  buttonStyles: {
-    position: 'absolute',
-    top: verticalSpace(20),
-    left: horizontalSpace(15),
-    height: heightPixel(50),
-    width: heightPixel(50),
-    backgroundColor: COLORS.WHITE,
-    elevation: 2,
-    borderRadius: heightPixel(30),
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 99,
-  },
-  paginatorWrapper: {
-    position: 'absolute',
-    bottom: -verticalSpace(55),
-    right: '45%',
-  },
-  detailsContainer: {
-    flex: 1,
-    backgroundColor: COLORS.WHITE,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: horizontalSpace(15),
-    elevation: 10,
-  },
-  productTitle: {
-    fontSize: fontSize(28),
-    color: COLORS.TEXT_PRIMARY,
-    fontWeight: '800',
-    marginVertical: verticalSpace(20),
-  },
-  ratingStockWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ratingContainer: {
-    height: heightPixel(40),
-    width: heightPixel(90),
-    flexDirection: 'row',
-    padding: 5,
-    borderColor: COLORS.BACKGROUND,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    borderRadius: heightPixel(25),
-  },
-  ratingStyles: {
-    color: COLORS.TEXT_PRIMARY,
-    fontSize: fontSize(18),
-    fontWeight: '800',
-  },
-  stockStatusWrapper: {
-    padding: 5,
-    backgroundColor: COLORS.ERROR,
-    borderRadius: 10,
-    marginLeft: horizontalSpace(20),
-  },
-  stockStatusStyles: {
-    color: COLORS.WHITE,
-    fontSize: fontSize(20),
-    fontWeight: '500',
-  },
-  descriptionStyles: {
-    color: COLORS.TEXT_PRIMARY,
-    fontSize: fontSize(18),
-    fontWeight: '500',
-    marginTop: verticalSpace(20),
-  },
-  bottomContainer: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    height: heightPixel(100),
-    width: screenWidth,
-    backgroundColor: COLORS.BACKGROUND,
-    elevation: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-  },
-  originalPriceStyles: {
-    fontSize: fontSize(18),
-    color: '#888',
-    fontWeight: '700',
-  },
-  finalPriceStyles: {
-    fontSize: fontSize(28),
-    color: COLORS.TEXT_PRIMARY,
-    fontWeight: '700',
-  },
-});

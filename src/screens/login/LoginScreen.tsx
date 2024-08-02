@@ -66,6 +66,7 @@ const LoginScreen = () => {
     setSecureTextEntry(!secureTextEntry);
   };
 
+  //error displaying modal toggler
   const closeErrorModal = () => {
     setIsErrorVisible(!isErrorVisible);
   };
@@ -167,7 +168,6 @@ const LoginScreen = () => {
             <Text style={orLoginText}>{STRINGS.OR_LOGIN}</Text>
             <View style={buttonsWrapper}>
               <ButtonWithIcon
-                // onPress={onGoogleButtonPressed}
                 icon={IMAGE_PATH.GOOGLE}
                 containerStyle={{
                   backgroundColor: `${COLORS.PRIMARY}30`,

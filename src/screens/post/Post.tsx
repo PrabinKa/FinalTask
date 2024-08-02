@@ -7,9 +7,9 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
 } from 'react-native';
-import {Header, UserInputs} from '../../components';
+import {Header, Loader, UserInputs} from '../../components';
 import {getPosts, searchPosts, deletePost} from '../../services/PostService';
-import {COLORS, verticalSpace, horizontalSpace} from '../../constants';
+import {COLORS, verticalSpace, horizontalSpace, STRINGS} from '../../constants';
 import {PostInterface} from '../../types/PostTypes';
 import ReactionButton from './ReactionButton';
 import PostTags from './PostTags';
@@ -32,30 +32,35 @@ const Post: React.FC<PostProps> = ({navigation}) => {
     viewsStyles,
     viewsTextStyles,
   } = styles;
+
   const [postsData, setPostsData] = useState<PostInterface[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [debounceTimeout, setDebounceTimeout] = useState<ReturnType<
     typeof setTimeout
   > | null>(null);
-
-  // console.log('ppppp', postsData)
 
   useEffect(() => {
     fetchInitialData();
   }, []);
 
+  //initially fetch 10 posts details
   const fetchInitialData = async () => {
+    setIsLoading(true);
     try {
       const response = await getPosts('/posts?limit=10');
       const data = await response.json();
-      // console.log('data', data)
 
       setPostsData(data.posts);
     } catch (error) {
       console.error('Error fetching initial data:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  //fetch more 10 posts details on every pull to refresh
   const handleRefresh = async () => {
     setRefreshing(true);
 
@@ -70,15 +75,20 @@ const Post: React.FC<PostProps> = ({navigation}) => {
     }
   };
 
+  //search posts from api
   const fetchSearchData = async (query: string) => {
+    setIsLoading(true);
     try {
       const data = await searchPosts(query);
       setPostsData(data.posts);
     } catch (error) {
       console.error('Error searching posts:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  //debouncing functionality for search
   const handleSearch = (text: string) => {
     // Clear the previous debounce timeout
     if (debounceTimeout) {
@@ -93,7 +103,9 @@ const Post: React.FC<PostProps> = ({navigation}) => {
     setDebounceTimeout(timeout);
   };
 
+  //deletes post
   const postDeleteHandler = async (id: number) => {
+    setIsLoading(true);
     try {
       // Optimistically update the UI
       setPostsData(prevPosts =>
@@ -123,6 +135,8 @@ const Post: React.FC<PostProps> = ({navigation}) => {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -187,7 +201,7 @@ const Post: React.FC<PostProps> = ({navigation}) => {
                         </View>
                         <View style={reactionWrapper}>
                           <Text style={viewsStyles}>{item.views}</Text>
-                          <Text style={viewsTextStyles}>views</Text>
+                          <Text style={viewsTextStyles}>{STRINGS.VIEWS}</Text>
                         </View>
                       </View>
                     </View>
@@ -197,6 +211,7 @@ const Post: React.FC<PostProps> = ({navigation}) => {
             />
           )}
         </View>
+        <Loader isLoading={isLoading} />
       </Header>
     </TouchableWithoutFeedback>
   );

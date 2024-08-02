@@ -5,7 +5,7 @@ export const login = async (username: string, password: string) => {
   const response = await axios.post(`${BASE_URL}${LOGIN}`, {
     username,
     password,
-    expiresInMins: 30,
+    expiresInMins: 2,
   });
   return response;
 };

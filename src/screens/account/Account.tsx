@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Image, Linking, Text, View} from 'react-native';
+import React, {useEffect, useContext, useState} from 'react';
+import {Image, Linking, Text, View, Alert} from 'react-native';
 import {Header, PlainButton} from '../../components';
 import {
   COLORS,
@@ -7,16 +7,19 @@ import {
   horizontalSpace,
   IMAGE_PATH,
   verticalSpace,
+  STRINGS,
 } from '../../constants';
 import TouchableInputs from './TouchableInputs';
 import {styles} from './Styles';
-import {Loader} from '../../components';
-import axios from 'axios';
-import {decryptData, retrieveData, storeData} from '../../utils';
-
-const axiosInstance = axios.create({
-  baseURL: `https://dummyjson.com/auth/`,
-});
+import {Loader, ErrorModal} from '../../components';
+import {AppContext} from '../../context/AppContext';
+import axiosInstance from '../../services/axiosInstance';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks/hooks';
+import {
+  userDetailsLoading,
+  getUserDetails,
+  userDetailsRejected,
+} from '../../redux/slices/UserSlice';
 
 interface AccountProps {
   navigation: any;
@@ -31,128 +34,93 @@ const Account: React.FC<AccountProps> = ({navigation}) => {
     profileImage,
     contentWrapper,
   } = styles;
-  const [isLoading, setIsloading] = useState(false);
-
-  axiosInstance.interceptors.request.use(
-    async config => {
-      // Retrieve the access token from AsyncStorage
-      const accessToken = await retrieveData('access_token');
-
-      // Attach the access token to the request headers
-      if (accessToken) {
-        const decryptedAccessToken = await decryptData(
-          'access_token',
-          accessToken,
-        );
-        console.log('req inc token', decryptedAccessToken);
-        config.headers.Authorization = `Bearer ${decryptedAccessToken}`;
-      }
-
-      return config;
-    },
-    error => {
-      console.log('req', error);
-      return Promise.reject(error);
-    },
-  );
-
-  axiosInstance.interceptors.response.use(
-    response => {
-      // Handle successful responses
-      return response;
-    },
-    async error => {
-      // Handle error responses
-      const originalRequest = error.config;
-
-      console.log('original request', error);
-
-      // // Check if the error is due to an expired token
-      // if (error.response.status === 401 && !originalRequest._retry) {
-      //   originalRequest._retry = true;
-
-      //   try {
-      //     // Refresh the access token
-      //     const refreshToken = await retrieveData('refresh_token');
-      //     if (refreshToken) {
-      //       const decryptedRefreshToken = await decryptData(
-      //         'refresh_token',
-      //         refreshToken,
-      //       );
-      //       console.log('refresh response', decryptedRefreshToken);
-      //       try {
-      //         const response = await axiosInstance.post('refresh', {
-      //           decryptedRefreshToken,
-      //         });
-      //         // Update the access token in AsyncStorage
-      //         await storeData('accessToken', response.data.accessToken);
-      //       } catch (error) {
-      //         console.log('error refresh', error);
-      //       }
-      //     }
-
-      //     // Retry the original request with the new access token
-      //     return axiosInstance(originalRequest);
-      //   } catch (refreshError) {
-      //     // Handle refresh token error
-      //     console.error('Error refreshing token:', refreshError);
-      //     return Promise.reject(error);
-      //   }
-      // }
-
-      return Promise.reject(error);
-    },
-  );
+  const dispatch = useAppDispatch();
+  const {isLoading, user, error} = useAppSelector(state => state.user);
+  const {tokenHandler} = useContext(AppContext);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      setIsloading(true);
-      try {
-        const response = await axiosInstance.get('/me');
-        console.log('res', response.data);
-      } catch (error) {
-        console.log('Error fetching user data:', error);
-      } finally {
-        setIsloading(false);
-      }
-    };
-
     fetchUserDetails();
+
+    if (error) {
+      setIsVisible(true);
+    }
   }, []);
+
+  //redirects to login screen when error occurs in fetching user details
+  const onCloseHandler = () => {
+    setIsVisible(!isVisible);
+    tokenHandler('');
+  };
+
+  const fetchUserDetails = async () => {
+    dispatch(userDetailsLoading(true));
+    try {
+      const response = await axiosInstance.get('/me');
+
+      if (response.data) {
+        dispatch(getUserDetails(response.data));
+      }
+    } catch (error) {
+      console.log('Error fetching user data:', error);
+      dispatch(
+        userDetailsRejected(
+          `Error fetching user's details! Retry by logging in again.`,
+        ),
+      );
+    } finally {
+      dispatch(userDetailsLoading(false));
+    }
+  };
+
+  //logout func
+  const logoutHandler = () => {
+    Alert.alert('Logout !', 'Are you sure, you want to logout?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {text: 'OK', onPress: () => tokenHandler('')},
+    ]);
+  };
 
   return (
     <Header navigation={navigation}>
       <View style={container}>
         <View style={backgroundStyles} />
-        <Text style={usernameStyles}>Prabin Karki</Text>
+        <Text style={usernameStyles}>
+          {user ? `${user.firstName} ${user.lastName}` : `User Name`}
+        </Text>
         <View style={profileImageWrapper}>
-          <Image source={IMAGE_PATH.PROFILE} style={profileImage} />
+          {user ? (
+            <Image source={{uri: user.image}} style={profileImage} />
+          ) : (
+            <Image source={IMAGE_PATH.PROFILE} style={profileImage} />
+          )}
         </View>
         <View style={contentWrapper}>
           <TouchableInputs
             icon={'person-outline'}
-            value="Prabin Karki"
-            onPress={() => {}}
+            value={user ? `${user.firstName} ${user.lastName}` : `User Name`}
           />
           <TouchableInputs
             icon={'mail-outline'}
-            value="PrabinKarki4296@gmail.com"
-            onPress={() => {}}
-          />
-          <TouchableInputs
-            icon={'phone-portrait-outline'}
-            value="9811920427"
+            value={user ? `${user.email}` : `dummyUser@gmail.com`}
             onPress={() => {
-              Linking.openURL('tel:9811920427');
+              Linking.openURL(`mailto:${user.email}`);
             }}
           />
           <TouchableInputs
-            icon={'eye-off-outline'}
-            value="xxxxxxxxxxxx"
-            onPress={() => {}}
+            icon={'phone-portrait-outline'}
+            value={user ? `${user.phone}` : `123456789`}
+            onPress={() => {
+              Linking.openURL(`tel:${user.phone}`);
+            }}
           />
+          <TouchableInputs icon={'eye-off-outline'} value="xxxxxxxxxxxx" />
 
           <PlainButton
+            onPress={logoutHandler}
             containerStyle={{
               marginHorizontal: horizontalSpace(15),
               height: heightPixel(50),
@@ -162,11 +130,16 @@ const Account: React.FC<AccountProps> = ({navigation}) => {
             textStyle={{
               color: COLORS.WHITE,
             }}>
-            Edit profile
+            {STRINGS.LOGOUT}
           </PlainButton>
         </View>
       </View>
       <Loader isLoading={isLoading} />
+      <ErrorModal
+        isVisible={isVisible}
+        message={error}
+        onClose={onCloseHandler}
+      />
     </Header>
   );
 };

@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 import {useAppSelector} from '../../redux/hooks/hooks';
-import {COLORS, verticalSpace, heightPixel} from '../../constants';
+import {COLORS, verticalSpace, heightPixel, STRINGS} from '../../constants';
 import CartItem from './CartItem';
+import ItemsNotAdded from './ItemsNotAdded';
 import {PlainButton, ErrorModal, Header} from '../../components';
 import {styles} from './Styles';
 
@@ -11,26 +12,22 @@ interface CartProps {
 }
 
 const Cart: React.FC<CartProps> = ({navigation}) => {
-  const {
-    container,
-    totalPriceWrapper,
-    totalPriceText,
-    totalPriceValue,
-  } = styles;
+  const {container, totalPriceWrapper, totalPriceText, totalPriceValue} =
+    styles;
 
   const {cartProducts, error} = useAppSelector(state => state.cart);
-
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     setModalVisible(true);
   }, [error]);
 
+  //error modal toggler
   const toggleModal = () => {
     setModalVisible(!modalVisible);
   };
 
-  //calculate total price of products added to the cart
+  //calculate total price of all products added to the cart
   const calculateTotalPrice = () => {
     let totalPrice = 0;
 
@@ -68,7 +65,7 @@ const Cart: React.FC<CartProps> = ({navigation}) => {
               textStyle={{
                 color: COLORS.WHITE,
               }}>
-              Check Out
+              {STRINGS.CHECKOUT}
             </PlainButton>
           </>
         )}
@@ -79,6 +76,7 @@ const Cart: React.FC<CartProps> = ({navigation}) => {
             onClose={toggleModal}
           />
         )}
+        {cartProducts.length == 0 && <ItemsNotAdded />}
       </View>
     </Header>
   );

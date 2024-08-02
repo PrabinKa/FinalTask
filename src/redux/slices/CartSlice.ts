@@ -17,10 +17,12 @@ export const cartSlice = createSlice({
   reducers: {
     addToCart: (state, action) => {
       state.cartProducts.push(action.payload);
+      state.error = null;
     },
     increaseQuantity: (state, action) => {
       const product = state.cartProducts;
       const selectedProduct = action.payload;
+
 
       product.forEach(item => {
         if (item.minimumOrderQuantity >= item.quantity + 1 && item.stock >= 1) {
@@ -36,6 +38,8 @@ export const cartSlice = createSlice({
     decreaseQuantity: (state, action) => {
       const product = state.cartProducts;
       const selectedProduct = action.payload;
+
+      state.error = null;
 
       product.forEach(item => {
         if (item.id === selectedProduct.id && item.quantity >= 2) {

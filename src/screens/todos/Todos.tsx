@@ -5,14 +5,11 @@ import {
   FlatList,
   TouchableOpacity,
   ToastAndroid,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import {Header, UserInputs, Loader, ErrorModal} from '../../components';
-import {
-  COLORS,
-  verticalSpace,
-  horizontalSpace,
-  fontSize,
-} from '../../constants';
+import {COLORS, verticalSpace, horizontalSpace} from '../../constants';
 import {
   useGetTodosQuery,
   useDeleteTodoMutation,
@@ -48,20 +45,42 @@ const Todos: React.FC<TodosProps> = ({navigation}) => {
     useUpdateTodoStatusMutation();
 
   const [todoLists, setTodoLists] = useState<TodoInterface[]>([]);
+  const [searchText, setSearchText] = useState('');
+  const [filteredTodoLists, setFilteredTodoLists] = useState<TodoInterface[]>(
+    [],
+  );
   const [isVisible, setIsVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState(``);
 
   useEffect(() => {
     if (data) {
       setTodoLists(data.todos);
+      setFilteredTodoLists(data.todos);
     }
   }, [data]);
+
+  useEffect(() => {
+    searchTodos();
+  }, [searchText, todoLists]);
+
+  //search todos by title
+  const searchTodos = () => {
+    if (searchText.trim() === '') {
+      setFilteredTodoLists(todoLists);
+    } else {
+      const filtered = todoLists.filter(todo =>
+        todo.todo.toLowerCase().includes(searchText.toLowerCase()),
+      );
+      setFilteredTodoLists(filtered);
+    }
+  };
 
   //to close error displaying modal
   const toggleErrorModal = () => {
     setIsVisible(!isVisible);
   };
 
+  //deletes todo
   const todoDeleteHandler = async (id: number) => {
     try {
       // Optimistically update the UI
@@ -165,40 +184,42 @@ const Todos: React.FC<TodosProps> = ({navigation}) => {
   };
 
   return (
-    <Header navigation={navigation}>
-      <View style={container}>
-        <UserInputs
-          icon="search-sharp"
-          placeholder="Search todos.."
-          placeholderTextColor={COLORS.PRIMARY}
-          selectionColor={COLORS.PRIMARY}
-          containerStyle={{
-            marginTop: verticalSpace(40),
-            marginBottom: verticalSpace(10),
-            marginHorizontal: horizontalSpace(15),
-            elevation: 3,
-          }}
-          // onChangeText={handleSearch}
-        />
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <Header navigation={navigation}>
+        <View style={container}>
+          <UserInputs
+            icon="search-sharp"
+            placeholder="Search todos.."
+            placeholderTextColor={COLORS.PRIMARY}
+            selectionColor={COLORS.PRIMARY}
+            containerStyle={{
+              marginTop: verticalSpace(40),
+              marginBottom: verticalSpace(10),
+              marginHorizontal: horizontalSpace(15),
+              elevation: 3,
+            }}
+            onChangeText={text => setSearchText(text)}
+          />
 
-        <FlatList
-          data={todoLists}
-          keyExtractor={(item, index) => `${index}Todo${item.userId}`}
-          showsVerticalScrollIndicator={false}
-          renderItem={renderTodoItem}
-        />
-      </View>
-      {(isLoading || isDeleteLoading || isUpdateLoading) && (
-        <Loader isLoading={isLoading || isDeleteLoading || isUpdateLoading} />
-      )}
-      {errorMessage && (
-        <ErrorModal
-          message={errorMessage}
-          isVisible={isVisible}
-          onClose={toggleErrorModal}
-        />
-      )}
-    </Header>
+          <FlatList
+            data={filteredTodoLists}
+            keyExtractor={(item, index) => `${index}Todo${item.userId}`}
+            showsVerticalScrollIndicator={false}
+            renderItem={renderTodoItem}
+          />
+        </View>
+        {(isLoading || isDeleteLoading || isUpdateLoading) && (
+          <Loader isLoading={isLoading || isDeleteLoading || isUpdateLoading} />
+        )}
+        {errorMessage && (
+          <ErrorModal
+            message={errorMessage}
+            isVisible={isVisible}
+            onClose={toggleErrorModal}
+          />
+        )}
+      </Header>
+    </TouchableWithoutFeedback>
   );
 };
 

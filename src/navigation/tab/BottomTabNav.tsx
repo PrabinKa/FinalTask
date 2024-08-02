@@ -1,4 +1,5 @@
 import React from 'react';
+import {KeyboardAvoidingView} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {RouteProp} from '@react-navigation/native';
 import {ParamListBase} from '@react-navigation/routers';
@@ -19,6 +20,7 @@ const BottomTabNav: React.FC<BottomTabNavProps> = () => {
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: COLORS.ERROR,
         tabBarInactiveTintColor: COLORS.TEXT_PRIMARY,
         tabBarStyle: {
@@ -52,11 +54,7 @@ const BottomTabNav: React.FC<BottomTabNavProps> = () => {
         options={{
           tabBarLabel: 'Cart',
           tabBarIcon: ({color, size}) => (
-            <Ionicons
-              name="cart-outline"
-              color={color}
-              size={size}
-            />
+            <Ionicons name="cart-outline" color={color} size={size} />
           ),
         }}
       />
@@ -66,11 +64,7 @@ const BottomTabNav: React.FC<BottomTabNavProps> = () => {
         options={{
           tabBarLabel: 'Account',
           tabBarIcon: ({color, size}) => (
-            <Ionicons
-              name="person-circle-outline"
-              color={color}
-              size={size}
-            />
+            <Ionicons name="person-circle-outline" color={color} size={size} />
           ),
         }}
       />

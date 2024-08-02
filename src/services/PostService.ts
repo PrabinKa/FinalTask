@@ -24,7 +24,7 @@ interface CredentialsType {
 }
 
 export const editPost = async (id: number, credentials: CredentialsType) => {
-  const response = await fetch(`https://dummyjson.com/posts/${id}`, {
+  const response = await fetch(`${BASE_URL}/posts/${id}`, {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({

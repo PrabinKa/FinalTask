@@ -7,14 +7,17 @@ import {
   removeData,
 } from '../utils';
 import {ContextProviderProps, AppContextType} from '../types/ContextTypes';
+import axiosInstance from '../services/axiosInstance';
 
 export const AppContext = createContext<AppContextType>({
   token: null,
   tokenHandler: (prop: string) => {},
+  user: null,
 });
 
 const ContextProvider: React.FC<ContextProviderProps> = ({children}) => {
   const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
 
   //store and delete token when user login and logout
   const tokenHandler = async (token: string) => {
@@ -34,6 +37,7 @@ const ContextProvider: React.FC<ContextProviderProps> = ({children}) => {
 
   useEffect(() => {
     isUserLoggedIn();
+    fetchUserDetails();
   }, []);
 
   const isUserLoggedIn = async () => {
@@ -48,11 +52,24 @@ const ContextProvider: React.FC<ContextProviderProps> = ({children}) => {
     }
   };
 
+  const fetchUserDetails = async () => {
+    try {
+      const response = await axiosInstance.get('/me');
+
+      if (response.data) {
+        setUser(response.data);
+      }
+    } catch (error) {
+      console.log('Error fetching user data:', error);
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
         token,
         tokenHandler,
+        user,
       }}>
       {children}
     </AppContext.Provider>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   StyleSheet,
   Text,
@@ -17,7 +17,7 @@ import {
   fontSize,
 } from '../../constants';
 import {priceAfterDiscount} from '../../utils';
-import {ProductInterface, ProductWithQuantity} from '../../types/ProductTypes';
+import {ProductWithQuantity} from '../../types/ProductTypes';
 import {useAppDispatch} from '../../redux/hooks/hooks';
 import {
   increaseQuantity,

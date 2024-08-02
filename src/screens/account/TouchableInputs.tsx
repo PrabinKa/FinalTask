@@ -6,7 +6,7 @@ import {heightPixel, horizontalSpace, fontSize, COLORS} from '../../constants';
 interface TouchableInputsProps {
   icon: string;
   value: string | number;
-  onPress: () => void;
+  onPress?: () => void;
 }
 
 const TouchableInputs = ({icon, value, onPress}: TouchableInputsProps) => {

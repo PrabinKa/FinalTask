@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useContext} from 'react';
 import {
   Image,
   ImageProps,
@@ -12,7 +12,7 @@ import {
   DrawerContentScrollView,
 } from '@react-navigation/drawer';
 import BottomTabNav from '../tab/BottomTabNav';
-import {Todos, Account, Post} from '../../screens';
+import {Todos, Post} from '../../screens';
 import {
   COLORS,
   DRAWER_SCREENS,
@@ -95,16 +95,7 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
   navigation,
 }) => {
   const [selectedTab, setSelectedTab] = useState('Product');
-  const {tokenHandler} = useContext(AppContext);
-
-  const [currentUser, setCurrentUser] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    profileImage: '',
-    phone: '',
-  });
+  const {tokenHandler, user} = useContext(AppContext);
 
   const logoutHandler = () => {
     Alert.alert('Logout !', 'Are you sure, you want to logout?', [
@@ -127,15 +118,27 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
           paddingTop: verticalSpace(10),
         }}>
         <View>
-          <Image
-            source={IMAGE_PATH.PROFILE}
-            resizeMode="contain"
-            style={{
-              width: heightPixel(80),
-              height: heightPixel(80),
-              borderRadius: 40,
-            }}
-          />
+          {user ? (
+            <Image
+              source={{uri: user.image}}
+              resizeMode="contain"
+              style={{
+                width: heightPixel(80),
+                height: heightPixel(80),
+                borderRadius: 40,
+              }}
+            />
+          ) : (
+            <Image
+              source={IMAGE_PATH.PROFILE}
+              resizeMode="contain"
+              style={{
+                width: heightPixel(80),
+                height: heightPixel(80),
+                borderRadius: 40,
+              }}
+            />
+          )}
           <View style={{marginLeft: 5, justifyContent: 'center'}}>
             <Text
               style={{
@@ -144,7 +147,7 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
                 fontSize: fontSize(18),
                 marginTop: verticalSpace(10),
               }}>
-              {`Prabin Karki`}
+              {user ? `${user.firstName} ${user.lastName}` : `User Name`}
             </Text>
             <Text
               numberOfLines={1}
@@ -153,7 +156,7 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
                 fontWeight: 'bold',
                 fontSize: fontSize(14),
               }}>
-              {`PrabinKarki4296@gmail.com`}
+              {user ? `${user.email}` : `dummyUser@gmail.com`}
             </Text>
           </View>
         </View>
@@ -174,15 +177,6 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
             onPress={() => {
               setSelectedTab(DRAWER_SCREENS.todo);
               navigation.navigate('Todo');
-            }}
-          />
-          <CustomDrawerItem
-            label={DRAWER_SCREENS.account}
-            icon={DRAWER_ICONS.acount}
-            isFocused={selectedTab == DRAWER_SCREENS.account}
-            onPress={() => {
-              setSelectedTab(DRAWER_SCREENS.account);
-              navigation.navigate('Account');
             }}
           />
           <CustomDrawerItem
@@ -232,9 +226,6 @@ const DrawerNavigator = () => {
         </Drawer.Screen>
         <Drawer.Screen name="Todo">
           {props => <Todos {...props} />}
-        </Drawer.Screen>
-        <Drawer.Screen name="Account">
-          {props => <Account {...props} />}
         </Drawer.Screen>
         <Drawer.Screen name="Post">
           {props => <Post {...props} />}
