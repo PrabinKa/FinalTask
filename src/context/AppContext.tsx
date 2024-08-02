@@ -13,6 +13,7 @@ export const AppContext = createContext<AppContextType>({
   token: null,
   tokenHandler: (prop: string) => {},
   user: null,
+  fetchUserDetails: () => {},
 });
 
 const ContextProvider: React.FC<ContextProviderProps> = ({children}) => {
@@ -37,7 +38,6 @@ const ContextProvider: React.FC<ContextProviderProps> = ({children}) => {
 
   useEffect(() => {
     isUserLoggedIn();
-    fetchUserDetails();
   }, []);
 
   const isUserLoggedIn = async () => {
@@ -70,6 +70,7 @@ const ContextProvider: React.FC<ContextProviderProps> = ({children}) => {
         token,
         tokenHandler,
         user,
+        fetchUserDetails,
       }}>
       {children}
     </AppContext.Provider>

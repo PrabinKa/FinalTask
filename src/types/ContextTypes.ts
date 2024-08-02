@@ -8,4 +8,5 @@ export interface AppContextType {
   token: string | null;
   tokenHandler: (token: string) => void;
   user: any;
+  fetchUserDetails: () => void;
 }

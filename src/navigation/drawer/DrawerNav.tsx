@@ -97,6 +97,8 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
   const [selectedTab, setSelectedTab] = useState('Product');
   const {tokenHandler, user} = useContext(AppContext);
 
+  console.log('user', user)
+
   const logoutHandler = () => {
     Alert.alert('Logout !', 'Are you sure, you want to logout?', [
       {

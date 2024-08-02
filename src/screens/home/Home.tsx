@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {StyleSheet, Text, View, ScrollView} from 'react-native';
 import {Header, Loader} from '../../components';
 import {COLORS, fontSize, heightPixel, verticalSpace} from '../../constants';
 import ImageBanner from './ImageBanner';
 import {fetchProducts} from '../../services/FetchProducts';
 import ProductContainer from './ProductContainer';
+import {AppContext} from '../../context/AppContext';
 
 interface HomeProps {
   navigation: any;
@@ -16,9 +17,11 @@ const Home: React.FC<HomeProps> = ({navigation}) => {
   const [smartPhoneProducts, setSmartPhoneProducts] = useState();
   const [beautyProducts, setBeautyProducts] = useState();
   const [groceriesProducts, setGroceriesProducts] = useState();
+  const {fetchUserDetails} = useContext(AppContext);
 
   useEffect(() => {
     getAllProducts();
+    fetchUserDetails();
   }, []);
 
   //product lists by category
